@@ -63,20 +63,17 @@ func (hid *usbDevice) ioctl(n uint32, arg interface{}) (int, error) {
 
 func (hid *usbDevice) claim() error {
 	ifno := uint32(hid.info.Interface)
-	if r, errno := hid.ioctl(USBDEVFS_IOCTL, &usbfsIoctl{
+	hid.ioctl(USBDEVFS_IOCTL, &usbfsIoctl{
 		Interface: ifno,
 		IoctlCode: USBDEVFS_DISCONNECT,
 		Data:      0,
-	}); r == -1 {
-		log.Println("driver disconnect failed:", r, errno)
-	}
+	})
 
 	if r, errno := hid.ioctl(USBDEVFS_CLAIM, &ifno); r == -1 {
 		return errno
 	} else {
 		return nil
 	}
-	return nil
 }
 
 func (hid *usbDevice) release() error {
@@ -85,13 +82,12 @@ func (hid *usbDevice) release() error {
 		return errno
 	}
 
-	if r, errno := hid.ioctl(USBDEVFS_IOCTL, &usbfsIoctl{
+	hid.ioctl(USBDEVFS_IOCTL, &usbfsIoctl{
 		Interface: ifno,
 		IoctlCode: USBDEVFS_CONNECT,
 		Data:      0,
-	}); r == -1 {
-		log.Println("driver connect failed:", r, errno)
-	}
+	})
+
 	return nil
 }
 
